@@ -2,7 +2,8 @@
 
 pkgs.mkShell {
   packages = with pkgs; [
-    clang
+    llvmPackages.libcxx
+
     cmake
     ninja
     pkg-config
@@ -13,4 +14,11 @@ pkgs.mkShell {
     webkitgtk_4_1
     sysprof
   ];
+
+  shellHook = ''
+    export CC=clang
+    export CXX=clang++
+
+    export CPLUS_INCLUDE_PATH="${pkgs.llvmPackages.libcxx}/include/c++/v1"
+  '';
 }
