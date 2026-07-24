@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(
     Lumi
@@ -10,6 +11,8 @@ project(
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(cmake/Dependencies.cmake)
+
 file(GLOB_RECURSE LUMI_SOURCES
     CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
@@ -17,12 +20,17 @@ file(GLOB_RECURSE LUMI_SOURCES
 
 add_library(lumi STATIC ${LUMI_SOURCES})
 
+target_link_libraries(lumi
+    PRIVATE
+        webview::core
+        nlohmann_json::nlohmann_json
+        httplib::httplib
+)
+
 target_include_directories(lumi
     PUBLIC
         "${PROJECT_SOURCE_DIR}/include"
 )
-
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(test-app
     test/main.cpp

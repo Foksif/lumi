@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -e
+
+case "$1" in
+    build)
+        cmake -B build
+        cmake --build build -j$(nproc)
+        ;;
+    run)
+        cmake -B build
+        cmake --build build -j$(nproc)
+        ./build/test-app
+        ;;
+    clean)
+        rm -rf build
+        ;;
+    rebuild)
+        rm -rf build
+        cmake -B build
+        cmake --build build -j$(nproc)
+        ;;
+    *)
+        echo "Usage: $0 {build|run|clean|rebuild}"
+        exit 1
+        ;;
+esac
