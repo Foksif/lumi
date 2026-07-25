@@ -1,5 +1,6 @@
 build/
 .cache/
 target/
+lumi-cli/generator
 
 CMakeCache.txt
