@@ -1,12 +1,10 @@
 #include <filesystem>
-#include <httplib.h>
-#include <iostream>
 
 #include <lumi/App.hpp>
 #include <string>
-#include <thread>
 #include <webview/webview.h>
 
+#include <lumi/LocalServer.hpp>
 #include <lumi/ResourceManager.hpp>
 
 namespace lumi {
@@ -41,37 +39,15 @@ void App::run() {
   if (hasResources) {
     ResourceManager manager(resources);
 
-    httplib::Server server;
+    LocalServer server(manager);
+    server.start();
 
-    server.Get(R"(.*)",
-               [&](const httplib::Request &req, httplib::Response &res) {
-                 std::string path = req.path;
-
-                 if (path == "/")
-                   path = "/index.html";
-
-                 if (!path.empty() && path.front() == '/')
-                   path.erase(0, 1);
-
-                 auto resource = manager.find(path);
-
-                 if (!resource) {
-                   res.status = 404;
-                   res.set_content("404 Not Found", "text/plain");
-                   return;
-                 }
-
-                 res.set_content(reinterpret_cast<const char *>(resource->data),
-                                 resource->size, "text/html");
-               });
-
-    std::thread serverThread([&]() { server.listen("127.0.0.1", 38451); });
-
-    window.navigate("http://127.0.0.1:38451/");
+    std::string domain =
+        "http://127.0.0.1:" + std::to_string(server.getServerPort());
+    window.navigate(domain);
     window.run();
 
     server.stop();
-    serverThread.join();
   } else {
     auto index = std::filesystem::absolute(frontendPath + "/index.html");
 
