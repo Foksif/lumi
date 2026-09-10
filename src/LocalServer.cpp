@@ -38,10 +38,17 @@ void LocalServer::start() {
 
         if (!path.empty() && path.front() == '/')
           path.erase(0, 1);
+      st:;
 
         auto resource = resources.find(path);
 
         if (!resource) {
+          auto spaFall = path.find_last_of('.');
+          if (spaFall == std::string_view::npos) {
+            path = "index.html";
+            goto st;
+          }
+
           res.status = 404;
           res.set_content("404 Not Found", "text/plain");
           return;
