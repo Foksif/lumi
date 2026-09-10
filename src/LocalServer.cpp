@@ -11,6 +11,8 @@
 #include <thread>
 #include <unistd.h>
 
+#include <lumi/MimeResolver.hpp>
+
 namespace lumi {
 class LocalServer::Impl {
 public:
@@ -46,7 +48,7 @@ void LocalServer::start() {
         }
 
         res.set_content(reinterpret_cast<const char *>(resource->data),
-                        resource->size, "text/html");
+                        resource->size, MimeResolver::resolve(path));
       });
 
   impl->serverThread =
