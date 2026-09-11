@@ -63,22 +63,8 @@ namespace lumi::generated {
     auto relative = fs::relative(entry.path(), root).generic_string();
     auto variable = sanitize(relative);
 
-    auto bytes = readFile(entry.path());
-
-    out << "inline const unsigned char " << variable << "[] = {\n    ";
-
-    for (size_t i = 0; i < bytes.size(); ++i) {
-      out << "0x" << std::uppercase << std::hex << std::setw(2)
-          << std::setfill('0') << static_cast<int>(bytes[i]);
-
-      if (i + 1 != bytes.size())
-        out << ", ";
-
-      if ((i + 1) % 16 == 0)
-        out << "\n    ";
-    }
-
-    out << "\n};\n\n";
+    out << "inline const unsigned char " << variable << "[] = {\n#embed "
+        << fs::relative(entry.path(), root) << "\n};\n\n";
 
     resources.push_back({relative, variable});
   }

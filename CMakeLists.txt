@@ -15,7 +15,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     message(STATUS "Using GCC")
 endif()
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
@@ -30,6 +30,7 @@ file(GLOB_RECURSE LUMI_SOURCES
 )
 
 
+add_compile_definitions(WEBVIEW_GTK=1)
 add_library(lumi STATIC
     ${LUMI_SOURCES}
 )
@@ -39,8 +40,9 @@ add_library(Lumi::lumi ALIAS lumi)
 
 
 target_link_libraries(lumi
-    PRIVATE
+    PUBLIC
         webview::core
+    PRIVATE
         nlohmann_json::nlohmann_json
         httplib::httplib
 )

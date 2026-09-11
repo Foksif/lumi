@@ -4,3 +4,4 @@ target/
 lumi-cli/generator
 
 CMakeCache.txt
+resources.hpp

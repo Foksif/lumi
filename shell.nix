@@ -5,13 +5,13 @@ pkgs.mkShell {
   llvmPackages.libcxx
 
   cmake
-  ninja
   pkg-config
   gnumake
   git
 
-  gtk3
-  webkitgtk_4_1
+  gtk4
+  webkitgtk_6_0
+  libsoup_3
 
   gst_all_1.gstreamer
   gst_all_1.gst-plugins-base

@@ -1,3 +1,5 @@
+#undef CPPHTTPLIB_ZLIB_SUPPORT
+
 #include <filesystem>
 
 #include <iostream>
@@ -35,7 +37,7 @@ void App::run() {
   webview::webview window(true, nullptr);
 
   window.set_title(title);
-  window.set_size(width, height, WEBVIEW_HINT_NONE);
+  // window.set_size(width, height, WEBVIEW_HINT_NONE);
 
   if (hasResources) {
     ResourceManager manager(resources);
