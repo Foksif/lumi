@@ -1,5 +1,6 @@
 #include <filesystem>
 
+#include <iostream>
 #include <lumi/App.hpp>
 #include <string>
 #include <webview/webview.h>
@@ -44,6 +45,7 @@ void App::run() {
 
     std::string domain =
         "http://127.0.0.1:" + std::to_string(server.getServerPort());
+    std::cout << "ServerDomain:" << "\t" << domain << "\n";
     window.navigate(domain);
     window.run();
 

@@ -31,6 +31,11 @@ LocalServer::~LocalServer() { stop(); }
 void LocalServer::start() {
   impl->server.Get(
       R"(.*)", [&](const httplib::Request &req, httplib::Response &res) {
+        std::cerr << "\n[LocalServer] request\n";
+        std::cerr << "  thread: " << std::this_thread::get_id() << '\n';
+        std::cerr << "  method: " << req.method << '\n';
+        std::cerr << "  path:   " << req.path << '\n';
+
         std::string path = req.path;
 
         if (path == "/")
@@ -38,26 +43,43 @@ void LocalServer::start() {
 
         if (!path.empty() && path.front() == '/')
           path.erase(0, 1);
-      st:;
+
+        std::cerr << "  lookup: " << path << '\n';
 
         auto resource = resources.find(path);
 
         if (!resource) {
+          std::cerr << "  result: NOT FOUND\n";
+
           auto spaFall = path.find_last_of('.');
           if (spaFall == std::string_view::npos) {
-            path = "index.html";
-            goto st;
-          }
+            std::cerr << "  SPA fallback -> index.html\n";
 
-          res.status = 404;
-          res.set_content("404 Not Found", "text/plain");
-          return;
+            path = "index.html";
+            resource = resources.find(path);
+
+            if (!resource) {
+              std::cerr << "  fallback result: NOT FOUND\n";
+              res.status = 404;
+              res.set_content("404 Not Found", "text/plain");
+              return;
+            }
+          } else {
+            res.status = 404;
+            res.set_content("404 Not Found", "text/plain");
+            return;
+          }
         }
 
-        res.set_content(reinterpret_cast<const char *>(resource->data),
-                        resource->size, MimeResolver::resolve(path));
-      });
+        auto mime = MimeResolver::resolve(path);
 
+        std::cerr << "  result: FOUND\n";
+        std::cerr << "  size:   " << resource->size << '\n';
+        std::cerr << "  mime:   " << mime << '\n';
+
+        res.set_content(reinterpret_cast<const char *>(resource->data),
+                        resource->size, mime);
+      });
   impl->serverThread =
       std::thread([&]() { impl->server.listen("127.0.0.1", serverPort); });
 }
