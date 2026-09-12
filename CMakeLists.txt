@@ -44,7 +44,6 @@ target_link_libraries(lumi
         webview::core
     PRIVATE
         nlohmann_json::nlohmann_json
-        httplib::httplib
 )
 
 

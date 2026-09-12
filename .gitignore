@@ -2,6 +2,7 @@ build/
 .cache/
 target/
 lumi-cli/generator
+lumi-cli/a.out
 
 CMakeCache.txt
 resources.hpp

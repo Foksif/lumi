@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <fstream>
-#include <iomanip>
+#include <gio/gio.h>
+#include <glib.h>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -26,6 +27,23 @@ std::string sanitize(std::string str) {
   }
 
   return str;
+}
+
+std::string get_mime_type(const std::string &filename) {
+  gchar *content_type = g_content_type_guess(filename.c_str(), NULL, 0, NULL);
+  gchar *mime_type = g_content_type_get_mime_type(content_type);
+
+  std::string result = mime_type ? mime_type : "application/octet-stream";
+
+  g_free(content_type);
+  g_free(mime_type);
+
+  if (result.rfind("text/", 0) == 0 || result == "application/json" ||
+      result == "image/svg+xml") {
+    result += "; charset=utf-8";
+  }
+
+  return result;
 }
 
 int main(int argc, char **argv) {
@@ -72,8 +90,8 @@ namespace lumi::generated {
   out << "inline const Resource files[] = {\n";
 
   for (const auto &r : resources) {
-    out << "    { \"" << r.path << "\", " << r.variable << ", sizeof("
-        << r.variable << ") },\n";
+    out << "    { \"" << r.path << "\", \"" << get_mime_type(r.path) << "\", "
+        << r.variable << ", sizeof(" << r.variable << ") },\n";
   }
 
   out << R"(};
