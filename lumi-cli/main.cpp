@@ -1,3 +1,4 @@
+#include <cctype>
 #include <filesystem>
 #include <fstream>
 #include <gio/gio.h>
@@ -30,7 +31,9 @@ std::string sanitize(std::string str) {
 }
 
 std::string get_mime_type(const std::string &filename) {
-  gchar *content_type = g_content_type_guess(filename.c_str(), NULL, 0, NULL);
+  gchar *content_type =
+      g_content_type_guess(filename.c_str(), nullptr, 0, nullptr);
+
   gchar *mime_type = g_content_type_get_mime_type(content_type);
 
   std::string result = mime_type ? mime_type : "application/octet-stream";
@@ -61,9 +64,14 @@ int main(int argc, char **argv) {
 
   std::ofstream out(root / "resources.hpp");
 
+  if (!out) {
+    std::cerr << "Failed to create resources.hpp\n";
+    return 1;
+  }
+
   out << R"(#pragma once
 
-#include <lumi/Resources.hpp>
+#include <lumi/resources/Resource.hpp>
 
 namespace lumi::generated {
 
@@ -79,19 +87,22 @@ namespace lumi::generated {
       continue;
 
     auto relative = fs::relative(entry.path(), root).generic_string();
+
     auto variable = sanitize(relative);
 
-    out << "inline const unsigned char " << variable << "[] = {\n#embed "
-        << fs::relative(entry.path(), root) << "\n};\n\n";
+    out << "inline const unsigned char " << variable << "[] = {\n";
+    out << "#embed \"" << relative << "\"\n";
+    out << "};\n\n";
 
     resources.push_back({relative, variable});
   }
 
   out << "inline const Resource files[] = {\n";
 
-  for (const auto &r : resources) {
-    out << "    { \"" << r.path << "\", \"" << get_mime_type(r.path) << "\", "
-        << r.variable << ", sizeof(" << r.variable << ") },\n";
+  for (const auto &resource : resources) {
+    out << "    { \"" << resource.path << "\", \""
+        << get_mime_type(resource.path) << "\", " << resource.variable
+        << ", sizeof(" << resource.variable << ") },\n";
   }
 
   out << R"(};
@@ -105,4 +116,6 @@ inline const Resources resources{
 )";
 
   std::cout << "Generated " << resources.size() << " resources.\n";
+
+  return 0;
 }

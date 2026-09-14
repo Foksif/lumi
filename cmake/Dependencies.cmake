@@ -7,4 +7,3 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(webview)
 
-find_package(nlohmann_json REQUIRED)

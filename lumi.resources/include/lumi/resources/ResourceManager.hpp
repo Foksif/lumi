@@ -1,8 +1,8 @@
 #pragma once
 
-#include <string_view>
+#include <lumi/resources/Resource.hpp>
 
-#include <lumi/Resources.hpp>
+#include <string_view>
 
 namespace lumi {
 
