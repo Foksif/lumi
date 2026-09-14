@@ -135,6 +135,8 @@ public:
 
     context = webkit_web_view_get_context(webView);
 
+    context = webkit_web_view_get_context(webView);
+
     gtk_window_set_child(GTK_WINDOW(window), GTK_WIDGET(webView));
 
     if (fullscreen) {
