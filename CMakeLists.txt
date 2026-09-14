@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 project(
     Lumi
     VERSION 0.1.0
@@ -9,62 +7,47 @@ project(
     LANGUAGES CXX
 )
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    message(STATUS "Using Clang")
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    message(STATUS "Using GCC")
-endif()
-
-set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(GNUInstallDirs)
 
 include(cmake/Dependencies.cmake)
 
+option(LUMI_BUILD_APP "Build Lumi App module" ON)
+option(LUMI_BUILD_WEBVIEW "Build Lumi WebView module" ON)
+option(LUMI_BUILD_RESOURCES "Build Lumi Resources module" ON)
+option(LUMI_BUILD_EXAMPLES "Build Lumi examples" OFF)
 
-file(GLOB_RECURSE LUMI_SOURCES
-    CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-)
+add_subdirectory(lumi.core)
 
+if(LUMI_BUILD_RESOURCES)
+    add_subdirectory(lumi.resources)
+endif()
 
-add_compile_definitions(WEBVIEW_GTK=1)
-add_library(lumi STATIC
-    ${LUMI_SOURCES}
-)
+if(LUMI_BUILD_WEBVIEW)
+    add_subdirectory(lumi.webview)
+endif()
 
+if(LUMI_BUILD_APP)
+    add_subdirectory(lumi.app)
+endif()
+
+add_library(lumi INTERFACE)
 
 add_library(Lumi::lumi ALIAS lumi)
 
+if(LUMI_BUILD_APP)
+    target_link_libraries(
+        lumi
+        INTERFACE
+            lumi.app
+    )
+endif()
 
-target_link_libraries(lumi
-    PUBLIC
-        webview::core
-    PRIVATE
-        nlohmann_json::nlohmann_json
-)
-
-
-target_include_directories(lumi
-    PUBLIC
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-)
-
-
-
-# Установка библиотеки
-
-install(
-    TARGETS lumi
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
-
-
-install(
-    DIRECTORY include/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
+if(LUMI_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
