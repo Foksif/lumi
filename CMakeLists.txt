@@ -21,6 +21,7 @@ option(LUMI_BUILD_APP "Build Lumi App module" ON)
 option(LUMI_BUILD_WEBVIEW "Build Lumi WebView module" ON)
 option(LUMI_BUILD_RESOURCES "Build Lumi Resources module" ON)
 option(LUMI_BUILD_EXAMPLES "Build Lumi examples" OFF)
+option(LUMI_BUILD_IPC "Build Lumi IPC module" ON)
 
 add_subdirectory(lumi.core)
 
@@ -30,6 +31,10 @@ endif()
 
 if(LUMI_BUILD_WEBVIEW)
     add_subdirectory(lumi.webview)
+endif()
+
+if(LUMI_BUILD_IPC)
+    add_subdirectory(lumi.ipc)
 endif()
 
 if(LUMI_BUILD_APP)
